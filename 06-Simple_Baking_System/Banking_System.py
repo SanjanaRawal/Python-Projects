@@ -63,12 +63,7 @@ class BankAccount:
                     return account
         return None
 
-
-print("Welcome to the banking system!")
-account = None
-
-
-def manage():
+def manage(account):
     while True:
         print("\n**** Menu ****")
         print("1. Deposit\n2. Withdraw\n3. Check Balance\n4. Show Transactions\n5. Exit")
@@ -96,34 +91,39 @@ def manage():
             print("Invalid choice! Try again.")
 
 
+print("Welcome to the banking system!")
+account = None
+
 while True:
-    choice = int(input("\nAlready have an account? (Login) (1)\nDon't have an account? (Signup) (2)\nEnter your choice: "))
+    choice = int(input("\n1.Already have an account? (Login) \n2.Don't have an account? (Signup) \n3.Exit \nEnter your choice: "))
 
     if choice == 2:  # Signup
         print("\nCreate the account - \n")
-        username = input("Enter username: ")
-        while True:
+        username = input("Enter username: ").strip()
+        if os.path.exists(f"{username}.json"):
+            print("Username already exists. Please choose a different username.")
+            continue
+        while True: #run when user doesn't exist already
             pin = input("Enter 4-digit PIN: ")
             if pin.isdigit() and len(pin) == 4:
                 account = BankAccount(username, pin)
                 account.save_data()
                 print(f"\nHello {username}, your account is successfully created.")
-                manage()
+                manage(account)
                 break
             else:
                 print("Invalid input, PIN must be a 4-digit number.")
-        break
 
     elif choice == 1:  # Login
         print("\nPlease login to continue - \n")
         attempts = 3
         while attempts > 0:
-            username = input("Enter username: ")
+            username = input("Enter username: ").strip()
             pin = input("Enter PIN: ")
             account = BankAccount.load_data(username, pin)
             if account:
                 print(f"\nLogin successful! Welcome back, {username}.\n")
-                manage()
+                manage(account)
                 break
             else:
                 attempts -= 1
@@ -131,7 +131,10 @@ while True:
                     print(f"Invalid credentials. Attempts left: {attempts}\n")
                 else:
                     print("\nToo many failed login attempts. Your account is temporarily blocked.")
-        break
 
+
+    elif choice==3  :
+        print("Exiting system....")
+        break
     else:
         print("Invalid choice. Enter 1 or 2.")
